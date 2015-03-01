@@ -15,25 +15,29 @@ For example:
 """
 
 def read_data(filename):
-    """ return list of points from file with structure like
-    (name, [x, y, q, r]), where x, y, q, r are some integers """
+    """ add data_id, convert '   ' to null, also replace all 9999.99 to null
+     return list of points from file with structure like
+    (data_id, [n1, n2,n3, null, n4, n5...,n15...]), where n  are some float"""
     data = []
     data_id = 0
-
     with codecs.open(filename) as f:
         next(f) # skip first line
         for line in f:
             coords = []
             line_strip = string.replace(line, '\r\n', '')
             components = line_strip.split('\t')
-            for i in components:              
-                try:
-                    coords.append(float(i))              
-                except ValueError:
-                   coords.append('null')                                 
+            for i in components:    
+                if i == "9999.99":
+                    coords.append('null')    
+                else: 
+                    try:
+                        coords.append(float(i))              
+                    except ValueError:
+                       coords.append('null')                                 
             data.append((data_id, coords))
             data_id+= 1
     return data
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -45,6 +49,8 @@ def main():
     filename = args.filename
 
     data = read_data(filename)
+
+
 if __name__ == '__main__':
     main()
 
