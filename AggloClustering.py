@@ -64,7 +64,7 @@ def get_data(filename):
         sigma = np.std(actual_vals)
         mean = np.mean(actual_vals)
         stdevs.append(sigma)
-        means.append(sigma)
+        means.append(mean)
         # standardize if value not empty, else replace with 0
         standardized_columns.append([(x - mean)/sigma if x is not None else 0 for x in column])
     # turn back into original form
@@ -138,6 +138,8 @@ def main():
     k = args.clusters
 
     data, stdevs, means = get_data(filename)
+    print stdevs
+    print means
     centers = cluster(data, k)
     for i in range(len(centers)):
         c = centers[i]
