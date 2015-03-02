@@ -1,5 +1,3 @@
-import string
-import math
 import argparse
 import csv
 import numpy as np
@@ -26,6 +24,12 @@ class Cluster(object):
                     avg[i] += elem
             avg = [i/len(self.points) for i in avg]
             self.centroid = avg
+
+    def sse(self):
+        sse = 0
+        for point in self.points:
+            sse += distance(self.centroid, point)
+        return sse
 
     def __repr__(self):
         return '<Cluster> center at {}'.format(self.centroid)
@@ -85,7 +89,7 @@ def calculate_cluster_distances(clusters):
         for j in range(i+1, len(clusters)):
             c2 = clusters[j]
             dist = distance(c1.centroid, c2.centroid)
-            pairings.append((dist, c1, c2))
+            pairings.append((dist, (c1, c2)))
     return pairings
 
 def cluster(data, k):
@@ -101,9 +105,9 @@ def cluster(data, k):
     while len(clusters) > k:
         # ignore clusters that have already been merged
         while True:
-            closest_clusters = heapq.heappop(cluster_pairings)
-            c1 = closest_clusters[1]
-            c2 = closest_clusters[2]
+            closest_clusters = heapq.heappop(cluster_pairings)[1]
+            c1 = closest_clusters[0]
+            c2 = closest_clusters[1]
             if c1.id not in clusters_to_ignore and c2.id not in clusters_to_ignore:
                 break
 
@@ -111,7 +115,6 @@ def cluster(data, k):
         merged_points = c1.points
         merged_points.extend(c2.points)
         merged = Cluster(merged_points)
-        # print c1.id, c2.id, merged.id
 
         # remove old clusters, remember to ignore them
         del clusters[c1.id]
@@ -122,7 +125,7 @@ def cluster(data, k):
         # calculate distance between merged cluster and all others
         for cluster in clusters.values():
             dist = distance(merged.centroid, cluster.centroid)
-            heapq.heappush(cluster_pairings, (dist, merged, cluster))
+            heapq.heappush(cluster_pairings, (dist, (merged, cluster)))
 
         clusters[merged.id] = merged
 
@@ -139,6 +142,7 @@ def main():
 
     data, stdevs, means = get_data(filename)
     centers = cluster(data, k)
+    total_sse = 0
     for i in range(len(centers)):
         c = centers[i]
         unstandardized_pt = []
@@ -146,7 +150,10 @@ def main():
             val = c.centroid[j]
             unstandardized = val*stdevs[j]+means[j]
             unstandardized_pt.append(unstandardized)
-        print "<Center> {}".format(unstandardized_pt)
+        total_sse += c.sse()
+        print "<Center>: {0}, SSE: {1}, {2} points".format(unstandardized_pt, c.sse(), len(c.points))
+
+    print "total sse: {}".format(total_sse)
 
 if __name__ == '__main__':
     main()
