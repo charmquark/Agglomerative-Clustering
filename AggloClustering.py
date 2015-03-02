@@ -138,8 +138,6 @@ def main():
     k = args.clusters
 
     data, stdevs, means = get_data(filename)
-    print stdevs
-    print means
     centers = cluster(data, k)
     for i in range(len(centers)):
         c = centers[i]
