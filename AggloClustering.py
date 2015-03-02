@@ -21,7 +21,8 @@ class Cluster(object):
             avg = [0] * len(self.points[0])
             for point in self.points:
                 for i, elem in enumerate(point):
-                    avg[i] += elem
+                    if elem is not None:
+                        avg[i] += elem
             avg = [i/len(self.points) for i in avg]
             self.centroid = avg
 
@@ -70,7 +71,7 @@ def get_data(filename):
         stdevs.append(sigma)
         means.append(mean)
         # standardize if value not empty, else replace with 0
-        standardized_columns.append([(x - mean)/sigma if x is not None else 0 for x in column])
+        standardized_columns.append([(x - mean)/sigma if x is not None else None for x in column])
     # turn back into original form
     standardized_rows = np.matrix.transpose(np.array(standardized_columns))
     return standardized_rows.tolist(), stdevs, means
@@ -79,7 +80,8 @@ def distance(p1, p2):
     """ euclidean^2 distance between 2 points """
     distance = 0
     for i in range(len(p1)):
-        distance += (p1[i]-p2[i])**2
+        if p1[i] is not None and p2[i] is not None:
+            distance += (p1[i]-p2[i])**2
     return distance
 
 def calculate_cluster_distances(clusters):
