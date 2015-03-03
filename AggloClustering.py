@@ -9,6 +9,9 @@ import uuid
 AggloClustering.py by Brian Charous and Yawen Chen
 An implementation of Agglomerative Clustering for the Carleton writing portfolio data
 
+We use a set to store all the distance in heap that we should ignore when they pop. 
+In this way, we decrease the amount of work finding and removing distance related to the most recently deleted centers. 
+
 Required Parameters: k (number of clusters) f (filename containing the data)
 For example: 
 python AggloClustering.py -f portfoliodata.txt -k 5
@@ -174,8 +177,6 @@ def main():
             unstandardized_pt.append(unstandardized)
         total_sse += c.sse()
         print "<Center>: {0}, SSE: {1}, {2} points \n".format(unstandardized_pt, c.sse(), len(c.points))
-        print "The id is:{0}:\n".format(c.id)
-
     print "Total sse: {} \n".format(total_sse)
 
 if __name__ == '__main__':
