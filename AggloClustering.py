@@ -100,17 +100,33 @@ def cluster(data, k):
         c = Cluster([row])
         clusters[c.id] = c
     cluster_pairings = calculate_cluster_distances(clusters.values())
+    count = 0
+    for t in range(len(cluster_pairings)):
+        if cluster_pairings[t][0]>50:
+            count+=1
+            print "distance is:{0} for the {1}th comparison \n".format(cluster_pairings[t][0], t)
+    print "total is:{0}\n".format(count)
     heapq.heapify(cluster_pairings)
     clusters_to_ignore = set()
+    
     while len(clusters) > k:
         # ignore clusters that have already been merged
         while True:
-            closest_clusters = heapq.heappop(cluster_pairings)[1]
+            #closest_clusters = heapq.heappop(cluster_pairings)[1]
+            closest = heapq.heappop(cluster_pairings)
+            closest_clusters = closest[1]
+            closest_dist = closest[0]
             c1 = closest_clusters[0]
             c2 = closest_clusters[1]
+            #print "closest distance is now:{0}".format(closest_dist)
             if c1.id not in clusters_to_ignore and c2.id not in clusters_to_ignore:
+                #print "\n ha, ones we should delete!"
                 break
+        print "***old distance is:{0} with id{1} and {2}: \n".format(closest_dist, c1.id, c2.id )
 
+        new_closest2 = heapq.heappop(cluster_pairings)
+        print "Before adding the new cluster the shortest distance is:{0} with id {1} and id {2}\n".format(new_closest2[0], new_closest2[1][0].id, new_closest2[1][1].id)
+        heapq.heappush(cluster_pairings, new_closest2)
         # merge clusters
         merged_points = c1.points
         merged_points.extend(c2.points)
@@ -126,9 +142,15 @@ def cluster(data, k):
         for cluster in clusters.values():
             dist = distance(merged.centroid, cluster.centroid)
             heapq.heappush(cluster_pairings, (dist, (merged, cluster)))
-
+        new_closest = heapq.heappop(cluster_pairings)
+        print "new distance is:{0} with id {1} and id {2}\n".format(new_closest[0], new_closest[1][0].id, new_closest[1][1].id)
+        heapq.heappush(cluster_pairings, new_closest)
+        count = 0
+        if new_closest2[0] != new_closest[0]:
+            count+= 1
+            print "new shortest created!"
         clusters[merged.id] = merged
-
+    print "count for all new shortest is {0} \n".format(count)
     return clusters.values()
 
 def main():
@@ -151,9 +173,10 @@ def main():
             unstandardized = val*stdevs[j]+means[j]
             unstandardized_pt.append(unstandardized)
         total_sse += c.sse()
-        print "<Center>: {0}, SSE: {1}, {2} points".format(unstandardized_pt, c.sse(), len(c.points))
+        print "<Center>: {0}, SSE: {1}, {2} points \n".format(unstandardized_pt, c.sse(), len(c.points))
+        print "The id is:{0}:\n".format(c.id)
 
-    print "total sse: {}".format(total_sse)
+    print "Total sse: {} \n".format(total_sse)
 
 if __name__ == '__main__':
     main()
