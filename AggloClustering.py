@@ -7,11 +7,11 @@ import uuid
 
 """
 AggloClustering.py by Brian Charous and Yawen Chen
-An implementation of Agglomerative Clustering
+An implementation of Agglomerative Clustering for the Carleton writing portfolio data
 
-To compile: clustering.py -k (number of clusters) -f (filename) -i (initialization method: either random or distance, default is random) 
+Required Parameters: k (number of clusters) f (filename containing the data)
 For example: 
-python AggloClustering.py.py -f portfoliodata.txt  -k 5
+python AggloClustering.py -f portfoliodata.txt -k 5
 """
 
 class Cluster(object):
