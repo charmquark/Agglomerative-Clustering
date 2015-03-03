@@ -101,6 +101,7 @@ def cluster(data, k):
         clusters[c.id] = c
     cluster_pairings = calculate_cluster_distances(clusters.values())
     count = 0
+    count2 = 0
     for t in range(len(cluster_pairings)):
         if cluster_pairings[t][0]>50:
             count+=1
@@ -145,12 +146,11 @@ def cluster(data, k):
         new_closest = heapq.heappop(cluster_pairings)
         print "new distance is:{0} with id {1} and id {2}\n".format(new_closest[0], new_closest[1][0].id, new_closest[1][1].id)
         heapq.heappush(cluster_pairings, new_closest)
-        count = 0
-        if new_closest2[0] != new_closest[0]:
-            count+= 1
-            print "new shortest created!"
+        if new_closest2[0] == new_closest[0]:
+            count2 += 1
+            print "Still old shortest path!"
         clusters[merged.id] = merged
-    print "count for all new shortest is {0} \n".format(count)
+    print "count for all new shortest is {0} \n".format(count2)
     return clusters.values()
 
 def main():
